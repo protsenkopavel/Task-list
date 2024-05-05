@@ -1,6 +1,5 @@
 package net.protsenko.tasklist.controller;
 
-import lombok.RequiredArgsConstructor;
 import net.protsenko.tasklist.domain.Task;
 import net.protsenko.tasklist.domain.User;
 import net.protsenko.tasklist.service.TaskService;
@@ -10,19 +9,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-public class MainController {
+@RequestMapping("/users")
+public class UserController {
 
     private final TaskService taskService;
     private final UserService userService;
 
-    public MainController(TaskService taskService, UserService userService) {
+    public UserController(TaskService taskService, UserService userService) {
         this.taskService = taskService;
         this.userService = userService;
-    }
-
-    @PutMapping
-    public Task updateTask(@RequestBody Task task) {
-        return taskService.update(task);
     }
 
     @PutMapping
@@ -36,11 +31,6 @@ public class MainController {
     }
 
     @GetMapping("/{id}")
-    public Task getTaskById(@PathVariable Long id) {
-        return taskService.getById(id);
-    }
-
-    @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id) {
         return userService.getById(id);
     }
@@ -48,11 +38,6 @@ public class MainController {
     @GetMapping("/{id}/tasks")
     public List<Task> getTasksByUserId(@PathVariable Long id) {
         return null;
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteTaskById(@PathVariable Long id) {
-        taskService.delete(id);
     }
 
     @DeleteMapping("/{id}")

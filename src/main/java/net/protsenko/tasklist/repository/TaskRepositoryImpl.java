@@ -1,6 +1,5 @@
 package net.protsenko.tasklist.repository;
 
-import lombok.RequiredArgsConstructor;
 import net.protsenko.tasklist.config.DataSourceConfig;
 import net.protsenko.tasklist.domain.Task;
 import org.springframework.stereotype.Repository;
@@ -9,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -52,8 +52,34 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public List<Task> findAllByUserId(Long userId) {
-        //TODO
-        return List.of();
+        try (Connection connection = dataSourceConfig.getDataSource().getConnection();) {
+
+            PreparedStatement statement = connection.prepareStatement("""
+                    SELECT t.id              as task_id,
+                           t.title           as task_title,
+                           t.description     as task_description
+                    FROM tasks t
+                             JOIN users u on t.id = u.id
+                    WHERE u.user_id = ?""");
+
+            statement.setLong(1, userId);
+
+            try (ResultSet rs = statement.executeQuery()) {
+                List<Task> tasks = new ArrayList<>();
+                while (rs.next()) {
+                    Task task = new Task();
+                    task.setId(rs.getLong("task_id"));
+                    if (!rs.wasNull()) {
+                        task.setTitle(rs.getString("task_title"));
+                        task.setDescription(rs.getString("task_description"));
+                    }
+                    tasks.add(task);
+                }
+                return tasks;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
