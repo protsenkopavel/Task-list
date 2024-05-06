@@ -6,13 +6,14 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
-@Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
 
     Long id;
 
     String name;
+
+    String email;
 
     String password;
 
@@ -48,5 +49,13 @@ public class User {
 
     public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

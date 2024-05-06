@@ -1,13 +1,10 @@
 package net.protsenko.tasklist.domain;
 
 import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-@Getter
-@Setter
+import java.time.LocalDateTime;
+
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Task {
 
@@ -16,6 +13,10 @@ public class Task {
     String title;
 
     String description;
+
+    Status status;
+
+    LocalDateTime expirationDate;
 
     public Long getId() {
         return id;
@@ -39,5 +40,21 @@ public class Task {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(LocalDateTime expirationDate) {
+        this.expirationDate = expirationDate;
     }
 }
