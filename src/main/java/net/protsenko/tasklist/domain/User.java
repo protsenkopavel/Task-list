@@ -1,7 +1,6 @@
 package net.protsenko.tasklist.domain;
 
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;

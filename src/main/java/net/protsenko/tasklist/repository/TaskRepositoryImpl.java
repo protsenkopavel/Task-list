@@ -1,13 +1,11 @@
 package net.protsenko.tasklist.repository;
 
 import net.protsenko.tasklist.config.DataSourceConfig;
+import net.protsenko.tasklist.domain.Status;
 import net.protsenko.tasklist.domain.Task;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +25,11 @@ public class TaskRepositoryImpl implements TaskRepository {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT t.id              as task_id,
                            t.title           as task_title,
-                           t.description     as task_description
+                           t.description     as task_description,
+                           t.expiration_date as task_expiration,
+                           t.status          as task_status
                     FROM tasks t
-                    WHERE id = ?""");
+                    WHERE t.id = ?""");
 
             statement.setLong(1, id);
 
@@ -40,6 +40,9 @@ public class TaskRepositoryImpl implements TaskRepository {
                     task.setId(rs.getLong("task_id"));
                     task.setTitle(rs.getString("task_title"));
                     task.setDescription(rs.getString("task_description"));
+                    task.setStatus(Status.valueOf(rs.getString("task_status")));
+                    Timestamp timestamp = rs.getTimestamp("task_expiration_date");
+                    task.setExpirationDate(timestamp.toLocalDateTime());
                     return task;
                 }
 
@@ -57,10 +60,12 @@ public class TaskRepositoryImpl implements TaskRepository {
             PreparedStatement statement = connection.prepareStatement("""
                     SELECT t.id              as task_id,
                            t.title           as task_title,
-                           t.description     as task_description
+                           t.description     as task_description,
+                           t.expiration_date as task_expiration,
+                           t.status          as task_status
                     FROM tasks t
-                             JOIN users u on t.id = u.id
-                    WHERE u.user_id = ?""");
+                             JOIN public.users_tasks ut on t.id = ut.task_id
+                    WHERE ut.user_id = ?""");
 
             statement.setLong(1, userId);
 
@@ -72,6 +77,9 @@ public class TaskRepositoryImpl implements TaskRepository {
                     if (!rs.wasNull()) {
                         task.setTitle(rs.getString("task_title"));
                         task.setDescription(rs.getString("task_description"));
+                        task.setStatus(Status.valueOf(rs.getString("task_status")));
+                        Timestamp timestamp = rs.getTimestamp("task_expiration_date");
+                        task.setExpirationDate(timestamp.toLocalDateTime());
                     }
                     tasks.add(task);
                 }
@@ -90,11 +98,16 @@ public class TaskRepositoryImpl implements TaskRepository {
                     UPDATE tasks
                     SET title = ?,
                         description = ?,
+                        expiration_date = ?,
+                        status = ?
                     WHERE id = ?""");
 
             statement.setString(1, task.getTitle());
             statement.setString(2, task.getDescription());
-            statement.setLong(3, task.getId());
+            statement.setTimestamp(3, Timestamp.valueOf(task.getExpirationDate()));
+            statement.setString(4, task.getStatus().name());
+            statement.setLong(5, task.getId());
+
             statement.executeUpdate();
 
         } catch (SQLException e) {
@@ -107,11 +120,13 @@ public class TaskRepositoryImpl implements TaskRepository {
         try (Connection connection = dataSourceConfig.getDataSource().getConnection();) {
 
             PreparedStatement statement = connection.prepareStatement("""
-                    INSERT INTO tasks (title, description)
-                    VALUES (?, ?)""");
+                    INSERT INTO tasks (title, description, expiration_date, status)
+                    VALUES (?, ?, ?, ?)""");
 
             statement.setString(1, task.getTitle());
             statement.setString(2, task.getDescription());
+            statement.setTimestamp(3, Timestamp.valueOf(task.getExpirationDate()));
+            statement.setString(4, task.getStatus().name());
             statement.executeUpdate();
 
         } catch (SQLException e) {

@@ -37,7 +37,7 @@ public class UserController {
 
     @GetMapping("/{id}/tasks")
     public List<Task> getTasksByUserId(@PathVariable Long id) {
-        return null;
+        return taskService.getAllByUserId(id);
     }
 
     @DeleteMapping("/{id}")
