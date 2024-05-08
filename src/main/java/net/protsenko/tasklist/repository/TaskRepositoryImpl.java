@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class TaskRepositoryImpl implements TaskRepository {
@@ -19,7 +20,7 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
-    public Task findById(Long id) {
+    public Optional<Task> findById(Long id) {
         try (Connection connection = dataSourceConfig.getDataSource().getConnection();) {
 
             PreparedStatement statement = connection.prepareStatement("""
@@ -43,7 +44,7 @@ public class TaskRepositoryImpl implements TaskRepository {
                     task.setStatus(Status.valueOf(rs.getString("task_status")));
                     Timestamp timestamp = rs.getTimestamp("task_expiration_date");
                     task.setExpirationDate(timestamp.toLocalDateTime());
-                    return task;
+                    return Optional.of(task);
                 }
 
                 return null;
@@ -148,6 +149,11 @@ public class TaskRepositoryImpl implements TaskRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void assignTaskToUser(Long taskId, Long userId) {
+
     }
 
 }

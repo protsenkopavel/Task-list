@@ -1,5 +1,5 @@
 package net.protsenko.tasklist.domain;
 
 public enum Status {
-    IN_PROGRESS, COMPLETED
+    UNSTARTED, IN_PROGRESS, COMPLETED
 }

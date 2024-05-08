@@ -3,10 +3,11 @@ package net.protsenko.tasklist.repository;
 import net.protsenko.tasklist.domain.Task;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TaskRepository {
 
-    Task findById(Long id);
+    Optional<Task> findById(Long id);
 
     List<Task> findAllByUserId(Long userId);
 
@@ -15,5 +16,7 @@ public interface TaskRepository {
     void create(Task task);
 
     void delete(Long id);
+
+    void assignTaskToUser(Long taskId, Long userId);
 
 }

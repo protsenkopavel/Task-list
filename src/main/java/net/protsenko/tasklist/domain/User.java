@@ -16,6 +16,8 @@ public class User {
 
     String password;
 
+    String passwordConfirm;
+
     List<Task> tasks;
 
     public Long getId() {
@@ -56,5 +58,13 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPasswordConfirm() {
+        return passwordConfirm;
+    }
+
+    public void setPasswordConfirm(String passwordConfirm) {
+        this.passwordConfirm = passwordConfirm;
     }
 }
